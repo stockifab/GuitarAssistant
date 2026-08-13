@@ -1,3 +1,5 @@
+import {Staff} from "./components/Staff/Staff.tsx";
+
 export function App() {
-    return <p>Guitar Assistant</p>
+    return <Staff />
 }
