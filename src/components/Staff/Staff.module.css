@@ -1,4 +1,10 @@
-.staffLine {
+/* Staff Line Container */
+.staffLineContainer {
+    position: relative;
+}
+
+/* Note Selector */
+.noteSelector {
     height: 15px;
     width: 100%;
     position: relative;
@@ -6,32 +12,40 @@
     overflow: visible;
 }
 
-.note {
+/* Note SVG */
+.noteSVG {
     position: absolute;
-    display: none;
     left: 50%;
-    height: 30px;
+    height: 100%;
     z-index: 10;
     pointer-events: none;
     overflow: visible;
 }
 
-.staffLine:hover .note {
+.note {
+    display: none;
+}
+
+/* Hover Note Preview */
+.noteSelector:hover .note {
     display: block;
     fill: lightgray;
     z-index: 20;
 }
 
-.staffLine:hover .visibleNote {
-    fill: gray!important;
-}
-
-.visibleNote {
+/* Picked Note */
+.activeNote {
     display: block;
     fill: black;
 }
 
-.visibleLine::after {
+/* Hovering a Line with a picked note */
+.noteSelector:hover .activeNote {
+    fill: gray;
+}
+
+/* Staff Line with a black line */
+.linedStaffLine::after {
     content: "";
     position: absolute;
     top: 50%;
@@ -39,6 +53,43 @@
     height: 2px;
     width: 100%;
     background: black;
+}
+
+/* Container left to the note selector line */
+.preNoteSelector {
+    position: absolute;
+    top: 0;
+    right: 100%;
+    margin-right: 10px;
+    justify-content: center;
+    line-height: 20px;
+    font-size: 15px;
+
+    display: flex;
+}
+
+.preNoteSelector p {
+    margin: 0;
+    text-align: right;
+    min-width: 20px;
+    color: lightgray;
+    user-select: none;
+}
+
+/* sharp/flat togglers */
+.preNoteSelector p:not(:last-child) {
+    cursor: pointer;
+}
+
+/* Note Name */
+.preNoteSelector p:last-child {
+    width: 40px;
+    color: black;
+}
+
+/* active pre note text (e.g.) active sharp/flat */
+.preNoteSelector p.active {
+    color: black;
 }
 
 .staffContainer {
