@@ -1,22 +1,22 @@
 import styles from "./Fretboard.module.css"
+import {Fragment} from "react";
 
 type FretProps = {
     width: number;
-    strings: number;
     pitchClassOffset: number;
-    stringPitchClasses: number[];
+    strings: number[];
     highlightedPitchClasses: number[]
 }
 
-function Fret({width, strings, stringPitchClasses, pitchClassOffset, highlightedPitchClasses}: FretProps) {
+function Fret({width, strings, pitchClassOffset, highlightedPitchClasses}: FretProps) {
     const height = 100;
 
     function getStringYOffset(stringIdx: number) {
-        return height / (strings) * stringIdx + height / (strings * 2)
+        return height / (strings.length) * stringIdx + height / (strings.length * 2)
     }
 
     function getStringPitchClass(stringIdx: number) {
-        return stringPitchClasses[stringIdx] + pitchClassOffset
+        return strings[stringIdx] + pitchClassOffset
     }
 
     return <svg width={width} height={height}>
@@ -25,8 +25,8 @@ function Fret({width, strings, stringPitchClasses, pitchClassOffset, highlighted
               fill="black"
         />
 
-        {[...Array(strings)].map((_, i) =>
-            <>
+        {[...Array(strings.length)].map((_, i) =>
+            <Fragment key={i}>
                 <rect width={width}
                       height="1"
                       y={getStringYOffset(i)}
@@ -34,7 +34,7 @@ function Fret({width, strings, stringPitchClasses, pitchClassOffset, highlighted
                 {highlightedPitchClasses.includes(getStringPitchClass(i)) &&
                     <circle cx={width / 2 - 1.75} r={3.5} cy={getStringYOffset(i)} fill="black"/>
                 }
-            </>
+            </Fragment>
         )}
     </svg>
 }
@@ -51,8 +51,7 @@ export function Fretboard({initialWidth, stringPitchClasses, highlightedPitchCla
             <Fret
                 key={i}
                 width={initialWidth * Math.pow(0.5, (i + 1) / 12)}
-                strings={6}
-                stringPitchClasses={stringPitchClasses}
+                strings={stringPitchClasses}
                 pitchClassOffset={i + 1}
                 highlightedPitchClasses={highlightedPitchClasses}
             />

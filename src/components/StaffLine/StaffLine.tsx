@@ -5,12 +5,19 @@ import styles from "./StaffLine.module.css"
 import {clsx} from "clsx";
 import {type PitchClass, pitchClassToName, type StaffIdx, staffIdxToPitchClass} from "../../utils/notes.ts";
 
+export type StaffLineState = {
+    showNote: boolean;
+    modifier: -1 | 0 | 1;
+    naturalPitchClass: PitchClass;
+}
+
 type StaffLineProps = {
     line: boolean;
     staffIdx: StaffIdx;
+    onChange: (state: StaffLineState) => void;
 }
 
-export function StaffLine({line, staffIdx,}: StaffLineProps) {
+export function StaffLine({line, staffIdx, onChange}: StaffLineProps) {
     const [showNote, setShowNote] = useState<boolean>(false)
     const [modifier, setModifier] = useState<-1 | 0 | 1>(0);
     // offset of the note from the left side of the staff line
@@ -35,6 +42,10 @@ export function StaffLine({line, staffIdx,}: StaffLineProps) {
 
         setNoteXOffset(clamp(mousePosition[0] - (staffLineBoundingBox?.x ?? 0), noteWidth / 2, staffLineWidth - noteWidth / 2))
     }, [showNote, mousePosition]);
+
+    useEffect(() => {
+        onChange({showNote, modifier, naturalPitchClass: staffIdxToPitchClass(staffIdx)})
+    }, [showNote, modifier, staffIdx]);
 
     function toggleNote() {
         setShowNote(!showNote)
