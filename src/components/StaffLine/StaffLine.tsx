@@ -3,10 +3,11 @@ import {useMousePosition} from "../../contexts/MousePositionContext.tsx";
 import {clamp} from "../../utils/mathUtils.ts";
 import styles from "./StaffLine.module.css"
 import {clsx} from "clsx";
-import {pitchClassToName, staffIdxToPitchClass} from "../../notes.ts";
+import {type PitchClass, pitchClassToName, type StaffIdx, staffIdxToPitchClass} from "../../utils/notes.ts";
 
 type StaffLineProps = {
-    line: boolean; staffIdx: number;
+    line: boolean;
+    staffIdx: StaffIdx;
 }
 
 export function StaffLine({line, staffIdx,}: StaffLineProps) {
@@ -20,8 +21,7 @@ export function StaffLine({line, staffIdx,}: StaffLineProps) {
     const staffLineRef = useRef<HTMLDivElement | null>(null);
     const noteRef = useRef<SVGEllipseElement | null>(null);
 
-
-    // update note position to match mouse unless its selected
+    // update note position to match mouse unless it's selected
     useEffect(() => {
         if (showNote) {
             return
@@ -53,7 +53,7 @@ export function StaffLine({line, staffIdx,}: StaffLineProps) {
         <div className={styles.preNoteSelector}>
             <p className={clsx(modifier == -1 && styles.active)} onClick={() => toggleModifier(-1)}>♭</p>
             <p className={clsx(modifier == 1 && styles.active)} onClick={() => toggleModifier(1)}>#</p>
-            <p className={styles.lineNoteNameText}>{pitchClassToName(staffIdxToPitchClass(staffIdx) + modifier)}</p>
+            <p className={styles.lineNoteNameText}>{pitchClassToName((staffIdxToPitchClass(staffIdx) + modifier) as PitchClass)}</p>
         </div>
 
         {/* Note Selector */}
