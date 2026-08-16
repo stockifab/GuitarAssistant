@@ -28,19 +28,19 @@
 /* Hover Note Preview */
 .noteSelector:hover .note {
     display: block;
-    fill: lightgray;
     z-index: 20;
+    opacity: 0.5;
 }
 
 /* Picked Note */
 .activeNote {
     display: block;
-    fill: black;
 }
 
-/* Hovering a Line with a picked note */
 .noteSelector:hover .activeNote {
-    fill: gray;
+    display: block;
+    z-index: 20;
+    opacity: 0.7;
 }
 
 /* Staff Line with a black line */

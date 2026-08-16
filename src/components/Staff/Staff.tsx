@@ -25,7 +25,7 @@ export function Staff({startStaffIdx, endStaffIdx, onStaffChange}: StaffProps) {
                 <StaffLine key={i}
                            line={i % 2 != 0}
                            staffIdx={(endStaffIdx - i) as StaffIdx}
-                           onChange={handleOnChange((endStaffIdx - i) as StaffIdx)}/>))}
+                           onChange={handleOnChange((startStaffIdx - i) as StaffIdx)}/>))}
         </MouseContextProvider>
     </div>)
 }

@@ -1,22 +1,38 @@
 import styles from "./Fretboard.module.css"
-import {Fragment} from "react";
+import {Fragment, useMemo} from "react";
+import type {FretIdx, StringIdx} from "../../lib/FretboardVisualization.ts";
+
+type DotProps = {
+    stringIdx: StringIdx;
+    color: string;
+}
+
+export type FretboardState = {
+    stringsCount: number;
+    fretCount: number;
+    dots: Map<FretIdx, DotProps[]>
+}
 
 type FretProps = {
     width: number;
-    pitchClassOffset: number;
-    strings: number[];
-    highlightedPitchClasses: number[]
+    fret: FretIdx;
+    state: FretboardState;
 }
 
-function Fret({width, strings, pitchClassOffset, highlightedPitchClasses}: FretProps) {
+function Fret({width, fret, state}: FretProps) {
     const height = 100;
+    const dotsToShow: Map<StringIdx, DotProps> = useMemo(() => {
+        const stringToDot: Map<StringIdx, DotProps> = new Map()
 
-    function getStringYOffset(stringIdx: number) {
-        return height / (strings.length) * stringIdx + height / (strings.length * 2)
-    }
+        for (const fretDot of state.dots.get(fret) ?? []) {
+            stringToDot.set(fretDot.stringIdx, fretDot)
+        }
 
-    function getStringPitchClass(stringIdx: number) {
-        return strings[stringIdx] + pitchClassOffset
+        return stringToDot
+    }, [state])
+
+    function getStringYOffset(stringIdx: StringIdx) {
+        return height / (state.stringsCount) * stringIdx + height / (state.stringsCount * 2)
     }
 
     return <svg width={width} height={height}>
@@ -25,14 +41,15 @@ function Fret({width, strings, pitchClassOffset, highlightedPitchClasses}: FretP
               fill="black"
         />
 
-        {[...Array(strings.length)].map((_, i) =>
-            <Fragment key={i}>
+        {[...Array(state.stringsCount)].map((_, stringIdx) =>
+            <Fragment key={stringIdx}>
                 <rect width={width}
                       height="1"
-                      y={getStringYOffset(i)}
+                      y={getStringYOffset(stringIdx as StringIdx)}
                 />
-                {highlightedPitchClasses.includes(getStringPitchClass(i)) &&
-                    <circle cx={width / 2 - 1.75} r={3.5} cy={getStringYOffset(i)} fill="black"/>
+                {dotsToShow.get(stringIdx as StringIdx) &&
+                    <circle cx={width / 2 - 1.75} r={3.5} cy={getStringYOffset(stringIdx as StringIdx)}
+                            fill={dotsToShow.get(stringIdx as StringIdx)!.color}/>
                 }
             </Fragment>
         )}
@@ -41,19 +58,17 @@ function Fret({width, strings, pitchClassOffset, highlightedPitchClasses}: FretP
 
 type FretboardProps = {
     initialWidth: number;
-    stringPitchClasses: number[];
-    highlightedPitchClasses: number[];
+    fretboardState: FretboardState;
 }
 
-export function Fretboard({initialWidth, stringPitchClasses, highlightedPitchClasses}: FretboardProps) {
+export function Fretboard({initialWidth, fretboardState}: FretboardProps) {
     return <div className={styles.fretboardContainer}>
-        {[...Array(12)].map((_, i) =>
+        {[...Array(fretboardState.fretCount)].map((_, fretIdx) =>
             <Fret
-                key={i}
-                width={initialWidth * Math.pow(0.5, (i + 1) / 12)}
-                strings={stringPitchClasses}
-                pitchClassOffset={i + 1}
-                highlightedPitchClasses={highlightedPitchClasses}
+                key={fretIdx}
+                width={initialWidth * Math.pow(0.5, (fretIdx + 1) / 12)}
+                fret={fretIdx + 1 as FretIdx}
+                state={fretboardState}
             />
         )}
     </div>

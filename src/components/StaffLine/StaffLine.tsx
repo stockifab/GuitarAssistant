@@ -1,9 +1,10 @@
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useMemo, useRef, useState} from "react";
 import {useMousePosition} from "../../contexts/MousePositionContext.tsx";
 import {clamp} from "../../utils/mathUtils.ts";
 import styles from "./StaffLine.module.css"
 import {clsx} from "clsx";
 import {type PitchClass, pitchClassToName, type StaffIdx, staffIdxToPitchClass} from "../../utils/notes.ts";
+import {noteToColor} from "../../utils/visualization.ts";
 
 export type StaffLineState = {
     showNote: boolean;
@@ -27,6 +28,7 @@ export function StaffLine({line, staffIdx, onChange}: StaffLineProps) {
 
     const staffLineRef = useRef<HTMLDivElement | null>(null);
     const noteRef = useRef<SVGEllipseElement | null>(null);
+    const pitchClass = useMemo(() => staffIdxToPitchClass(staffIdx) + modifier as PitchClass, [staffIdx, modifier])
 
     // update note position to match mouse unless it's selected
     useEffect(() => {
@@ -71,7 +73,7 @@ export function StaffLine({line, staffIdx, onChange}: StaffLineProps) {
         <div className={clsx(styles.noteSelector, line && styles.linedStaffLine)} onClick={toggleNote}>
             <svg className={clsx(styles.noteSVG)}>
                 <ellipse rx="21" ry="15" cx={noteXOffset} cy="7.5"
-                         className={clsx(styles.note, showNote && styles.activeNote)} ref={noteRef}/>
+                         className={clsx(styles.note, showNote && styles.activeNote)} ref={noteRef} fill={noteToColor(pitchClass)}/>
             </svg>
         </div>
     </div>
