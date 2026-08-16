@@ -9,9 +9,10 @@ type StaffProps = {
     startStaffIdx: StaffIdx;
     endStaffIdx: StaffIdx;
     onStaffChange: (states: Map<StaffIdx, StaffLineState>) => void;
+    isOutOfBounds: (idx: StaffIdx) => boolean;
 }
 
-export function Staff({startStaffIdx, endStaffIdx, onStaffChange}: StaffProps) {
+export function Staff({startStaffIdx, endStaffIdx, onStaffChange, isOutOfBounds}: StaffProps) {
     const staffState = useRef(new Map<StaffIdx, StaffLineState>())
 
     const handleOnChange = (staffIdx: StaffIdx) => function (state: StaffLineState) {
@@ -19,13 +20,19 @@ export function Staff({startStaffIdx, endStaffIdx, onStaffChange}: StaffProps) {
         onStaffChange(staffState.current)
     }
 
-    return (<div className={styles.staffContainer}>
-        <MouseContextProvider>
-            {[...Array(endStaffIdx - startStaffIdx)].map((_, i) => (
-                <StaffLine key={i}
-                           line={i % 2 != 0}
-                           staffIdx={(endStaffIdx - i) as StaffIdx}
-                           onChange={handleOnChange((startStaffIdx - i) as StaffIdx)}/>))}
-        </MouseContextProvider>
-    </div>)
+    return (
+        <div>
+            <div className={styles.staffContainer}>
+                <MouseContextProvider>
+                    {[...Array(endStaffIdx - startStaffIdx)].map((_, i) => (
+                        <StaffLine key={i}
+                                   line={i % 2 == 0} // TODO: The truthiness of this line depends on start and end staff indices, notes may appear on incorrect lines
+                                   staffIdx={(endStaffIdx - i) as StaffIdx}
+                                   onChange={handleOnChange((endStaffIdx - i) as StaffIdx)}
+                                   outOfBounds={isOutOfBounds(endStaffIdx - i as StaffIdx)}
+                        />))}
+                </MouseContextProvider>
+            </div>
+        </div>
+    )
 }

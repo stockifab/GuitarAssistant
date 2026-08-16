@@ -4,6 +4,7 @@ import {nameToPitchClass, type PitchClass, type StaffIdx} from "./utils/notes.ts
 import type {StaffLineState} from "./components/StaffLine/StaffLine.tsx";
 import {useState} from "react";
 import {type FretboardString, FretboardVisualization} from "./lib/FretboardVisualization.ts";
+import styles from "./App.module.css"
 
 const GUITAR_TUNING = [
     nameToPitchClass("E3"),
@@ -39,8 +40,8 @@ export function App() {
         setFretboardState(newState)
     }
 
-    return <>
-        <Staff startStaffIdx={-7 as StaffIdx} endStaffIdx={4 as StaffIdx} onStaffChange={onStaffChange}/>
-        <Fretboard initialWidth={60} fretboardState={fretboardState}/>
-    </>
+    return <div className={styles.main}>
+        <Staff startStaffIdx={-13 as StaffIdx} endStaffIdx={9 as StaffIdx} isOutOfBounds={(idx: StaffIdx) => idx > 4 || idx < -6} onStaffChange={onStaffChange}/>
+        <Fretboard initialWidth={120} height={230} fretboardState={fretboardState}/>
+    </div>
 }

@@ -16,13 +16,14 @@ type StaffLineProps = {
     line: boolean;
     staffIdx: StaffIdx;
     onChange: (state: StaffLineState) => void;
+    outOfBounds: boolean;
 }
 
-export function StaffLine({line, staffIdx, onChange}: StaffLineProps) {
+export function StaffLine({line, staffIdx, onChange, outOfBounds}: StaffLineProps) {
     const [showNote, setShowNote] = useState<boolean>(false)
     const [modifier, setModifier] = useState<-1 | 0 | 1>(0);
     // offset of the note from the left side of the staff line
-    const [noteXOffset, setNoteXOffset] = useState(0)
+    const [noteXOffset, setNoteXOffset] = useState<number | null>(null)
 
     const mousePosition = useMousePosition();
 
@@ -31,6 +32,7 @@ export function StaffLine({line, staffIdx, onChange}: StaffLineProps) {
     const pitchClass = useMemo(() => staffIdxToPitchClass(staffIdx) + modifier as PitchClass, [staffIdx, modifier])
 
     // update note position to match mouse unless it's selected
+    // TODO: move mouse position following to the parent component since all lines' note positions are the same (performance issue)
     useEffect(() => {
         if (showNote) {
             return
@@ -61,7 +63,7 @@ export function StaffLine({line, staffIdx, onChange}: StaffLineProps) {
         }
     }
 
-    return <div className={styles.staffLineContainer} ref={staffLineRef}>
+    return <div className={styles.staffLineContainer}>
         {/* Pre- NoteSelector */}
         <div className={styles.preNoteSelector}>
             <p className={clsx(modifier == -1 && styles.active)} onClick={() => toggleModifier(-1)}>♭</p>
@@ -70,9 +72,9 @@ export function StaffLine({line, staffIdx, onChange}: StaffLineProps) {
         </div>
 
         {/* Note Selector */}
-        <div className={clsx(styles.noteSelector, line && styles.linedStaffLine)} onClick={toggleNote}>
+        <div ref={staffLineRef} className={clsx(styles.noteSelector, line && styles.linedStaffLine, outOfBounds && styles.outOfBounds)} onClick={toggleNote}>
             <svg className={clsx(styles.noteSVG)}>
-                <ellipse rx="21" ry="15" cx={noteXOffset} cy="7.5"
+                <ellipse rx="45" ry="35" cx={noteXOffset} cy="17.5"
                          className={clsx(styles.note, showNote && styles.activeNote)} ref={noteRef} fill={noteToColor(pitchClass)}/>
             </svg>
         </div>

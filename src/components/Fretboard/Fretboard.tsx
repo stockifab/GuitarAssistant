@@ -14,6 +14,7 @@ export type FretboardState = {
 }
 
 type FretProps = {
+    height: number;
     width: number;
     fret: FretIdx;
     state: FretboardState;
@@ -26,8 +27,9 @@ function showFretboardMarker(fretIdx: FretIdx) {
     return (fretIdx + 1) % 2 == 0
 }
 
-function Fret({width, fret, state}: FretProps) {
-    const height = 100;
+function Fret({height, width, fret, state}: FretProps) {
+    const fontSize = height / 10
+
     const dotsToShow: Map<StringIdx, DotProps> = useMemo(() => {
         const stringToDot: Map<StringIdx, DotProps> = new Map()
 
@@ -55,28 +57,30 @@ function Fret({width, fret, state}: FretProps) {
                       y={getStringYOffset(stringIdx as StringIdx)}
                 />
                 {dotsToShow.get(stringIdx as StringIdx) &&
-                    <circle cx={width / 2} r={3.5} cy={getStringYOffset(stringIdx as StringIdx)}
+                    <circle cx={width / 2} r={fontSize / 3} cy={getStringYOffset(stringIdx as StringIdx)}
                             fill={dotsToShow.get(stringIdx as StringIdx)!.color}/>
                 }
             </Fragment>
         )}
 
-        <text x={width / 2} y={height + 12} textAnchor="middle" fontSize={10} fill="gray">{fret}</text>
-        {showFretboardMarker(fret) && <circle cx={width / 2} r={2} cy={height + 17} fill="black"/>}
+        <text x={width / 2} y={height + fontSize + fontSize / 5} textAnchor="middle" fontSize={fontSize} fill="gray">{fret}</text>
+        {showFretboardMarker(fret) && <circle cx={width / 2} r={fontSize / 5} cy={height + fontSize * 2} fill="gray"/>}
     </svg>
 }
 
 type FretboardProps = {
     initialWidth: number;
+    height: number;
     fretboardState: FretboardState;
 }
 
-export function Fretboard({initialWidth, fretboardState}: FretboardProps) {
+export function Fretboard({initialWidth, height, fretboardState}: FretboardProps) {
     return <div className={styles.fretboardContainer}>
         {[...Array(fretboardState.fretCount)].map((_, fretIdx) =>
             <Fret
                 key={fretIdx}
                 width={initialWidth * Math.pow(0.5, (fretIdx + 1) / 12)}
+                height={height}
                 fret={fretIdx + 1 as FretIdx}
                 state={fretboardState}
             />

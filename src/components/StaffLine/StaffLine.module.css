@@ -1,11 +1,12 @@
 /* Staff Line Container */
 .staffLineContainer {
     position: relative;
+    display: flex;
 }
 
 /* Note Selector */
 .noteSelector {
-    height: 15px;
+    height: 35px;
     width: 100%;
     position: relative;
     cursor: pointer;
@@ -49,28 +50,32 @@
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    height: 2px;
+    height: 3px;
     width: 100%;
     background: black;
 }
 
+.linedStaffLine.outOfBounds::after {
+    background: lightgray;
+    height: 2px;
+}
+
 /* Container left to the note selector line */
 .preNoteSelector {
-    position: absolute;
+    /*position: absolute;*/
     top: 0;
     right: 100%;
-    margin-right: 10px;
+    margin-right: 25px;
     justify-content: center;
-    line-height: 20px;
-    font-size: 15px;
-
+    font-size: 30px;
     display: flex;
 }
 
 .preNoteSelector p {
-    margin: 0;
+    margin: 18px 0 0;
     text-align: right;
-    min-width: 20px;
+    line-height: 0;
+    min-width: 50px;
     color: lightgray;
     user-select: none;
 }
@@ -82,7 +87,7 @@
 
 /* Note Name */
 .preNoteSelector p:last-child {
-    width: 40px;
+    width: 70px;
     color: black;
 }
 
