@@ -14,7 +14,7 @@ const GUITAR_TUNING = [
     nameToPitchClass("E5"),
 ]
 
-const FRET_COUNT = 12
+const FRET_COUNT = 15
 
 export function App() {
     const [fretboardState, setFretboardState] = useState<FretboardState>({

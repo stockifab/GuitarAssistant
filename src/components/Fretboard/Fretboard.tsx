@@ -19,6 +19,13 @@ type FretProps = {
     state: FretboardState;
 }
 
+function showFretboardMarker(fretIdx: FretIdx) {
+    if (fretIdx % 12 == 0) return true;
+    if ((fretIdx + 1) % 12 == 0 || (fretIdx - 1) % 12 == 0) return false;
+
+    return (fretIdx + 1) % 2 == 0
+}
+
 function Fret({width, fret, state}: FretProps) {
     const height = 100;
     const dotsToShow: Map<StringIdx, DotProps> = useMemo(() => {
@@ -35,7 +42,7 @@ function Fret({width, fret, state}: FretProps) {
         return height / (state.stringsCount) * stringIdx + height / (state.stringsCount * 2)
     }
 
-    return <svg width={width} height={height}>
+    return <svg width={width} height={height} className={styles.fretContainer}>
         <rect width="1"
               height={height}
               fill="black"
@@ -48,11 +55,14 @@ function Fret({width, fret, state}: FretProps) {
                       y={getStringYOffset(stringIdx as StringIdx)}
                 />
                 {dotsToShow.get(stringIdx as StringIdx) &&
-                    <circle cx={width / 2 - 1.75} r={3.5} cy={getStringYOffset(stringIdx as StringIdx)}
+                    <circle cx={width / 2} r={3.5} cy={getStringYOffset(stringIdx as StringIdx)}
                             fill={dotsToShow.get(stringIdx as StringIdx)!.color}/>
                 }
             </Fragment>
         )}
+
+        <text x={width / 2} y={height + 12} textAnchor="middle" fontSize={10} fill="gray">{fret}</text>
+        {showFretboardMarker(fret) && <circle cx={width / 2} r={2} cy={height + 17} fill="black"/>}
     </svg>
 }
 
