@@ -23,7 +23,7 @@ export function StaffLine({line, staffIdx, onChange, outOfBounds}: StaffLineProp
     const [showNote, setShowNote] = useState<boolean>(false)
     const [modifier, setModifier] = useState<-1 | 0 | 1>(0);
     // offset of the note from the left side of the staff line
-    const [noteXOffset, setNoteXOffset] = useState<number | null>(null)
+    const [noteXOffset, setNoteXOffset] = useState<number | undefined>(undefined);
 
     const mousePosition = useMousePosition();
 
@@ -31,20 +31,18 @@ export function StaffLine({line, staffIdx, onChange, outOfBounds}: StaffLineProp
     const noteRef = useRef<SVGEllipseElement | null>(null);
     const pitchClass = useMemo(() => staffIdxToPitchClass(staffIdx) + modifier as PitchClass, [staffIdx, modifier])
 
-    // update note position to match mouse unless it's selected
-    // TODO: move mouse position following to the parent component since all lines' note positions are the same (performance issue)
     useEffect(() => {
-        if (showNote) {
+        if (showNote || !staffLineRef.current || !noteRef.current || !mousePosition[0]) {
             return
         }
 
-        const staffLineBoundingBox = staffLineRef.current?.getBoundingClientRect()
-        const noteBoundingBox = noteRef.current?.getBoundingClientRect()
+        const staffLineBoundingBox = staffLineRef.current.getBoundingClientRect()
+        const noteBoundingBox = noteRef.current.getBoundingClientRect()
 
-        const staffLineWidth = staffLineBoundingBox?.width ?? 0
+        const staffLineWidth = staffLineBoundingBox.width ?? 0
         const noteWidth = noteBoundingBox?.width ?? 0
 
-        setNoteXOffset(clamp(mousePosition[0] - (staffLineBoundingBox?.x ?? 0), noteWidth / 2, staffLineWidth - noteWidth / 2))
+        setNoteXOffset(clamp(mousePosition[0] - (staffLineBoundingBox.x), noteWidth / 2, staffLineWidth - noteWidth / 2))
     }, [showNote, mousePosition]);
 
     useEffect(() => {
@@ -72,10 +70,13 @@ export function StaffLine({line, staffIdx, onChange, outOfBounds}: StaffLineProp
         </div>
 
         {/* Note Selector */}
-        <div ref={staffLineRef} className={clsx(styles.noteSelector, line && styles.linedStaffLine, outOfBounds && styles.outOfBounds)} onClick={toggleNote}>
+        <div ref={staffLineRef}
+             className={clsx(styles.noteSelector, line && styles.linedStaffLine, outOfBounds && styles.outOfBounds)}
+             onClick={toggleNote}>
             <svg className={clsx(styles.noteSVG)}>
                 <ellipse rx="45" ry="35" cx={noteXOffset} cy="17.5"
-                         className={clsx(styles.note, showNote && styles.activeNote)} ref={noteRef} fill={noteToColor(pitchClass)}/>
+                         className={clsx(styles.note, showNote && styles.activeNote)} ref={noteRef}
+                         fill={noteToColor(pitchClass)}/>
             </svg>
         </div>
     </div>

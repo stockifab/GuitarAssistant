@@ -24,13 +24,14 @@ export function Staff({startStaffIdx, endStaffIdx, onStaffChange, isOutOfBounds}
         <div>
             <div className={styles.staffContainer}>
                 <MouseContextProvider>
-                    {[...Array(endStaffIdx - startStaffIdx)].map((_, i) => (
+                    {[...Array(Math.abs(startStaffIdx - endStaffIdx))].map((_, i) => (
                         <StaffLine key={i}
-                                   line={i % 2 == 0} // TODO: The truthiness of this line depends on start and end staff indices, notes may appear on incorrect lines
+                                   line={(endStaffIdx - i) % 2 != 0}
                                    staffIdx={(endStaffIdx - i) as StaffIdx}
                                    onChange={handleOnChange((endStaffIdx - i) as StaffIdx)}
                                    outOfBounds={isOutOfBounds(endStaffIdx - i as StaffIdx)}
-                        />))}
+                        />
+                    ))}
                 </MouseContextProvider>
             </div>
         </div>

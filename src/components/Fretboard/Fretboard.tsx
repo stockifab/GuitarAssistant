@@ -11,6 +11,7 @@ export type FretboardState = {
     stringsCount: number;
     fretCount: number;
     dots: Map<FretIdx, DotProps[]>
+    stringsHighlights: Map<StringIdx, { color: string }>
 }
 
 type FretProps = {
@@ -44,6 +45,14 @@ function Fret({height, width, fret, state}: FretProps) {
         return height / (state.stringsCount) * stringIdx + height / (state.stringsCount * 2)
     }
 
+    function getStringColor(stringIdx: StringIdx) {
+        return state.stringsHighlights.get(stringIdx)?.color ?? "black"
+    }
+
+    function isStringHighlighted(stringIdx: StringIdx) {
+        return state.stringsHighlights.get(stringIdx) !== undefined
+    }
+
     return <svg width={width} height={height} className={styles.fretContainer}>
         <rect width="1"
               height={height}
@@ -53,8 +62,9 @@ function Fret({height, width, fret, state}: FretProps) {
         {[...Array(state.stringsCount)].map((_, stringIdx) =>
             <Fragment key={stringIdx}>
                 <rect width={width}
-                      height="1"
-                      y={getStringYOffset(stringIdx as StringIdx)}
+                      height={isStringHighlighted(stringIdx as StringIdx) ? 6 : 1}
+                      fill={getStringColor(stringIdx as StringIdx)}
+                      y={getStringYOffset(stringIdx as StringIdx) - (isStringHighlighted(stringIdx as StringIdx) ? 3 : 0)}
                 />
                 {dotsToShow.get(stringIdx as StringIdx) &&
                     <circle cx={width / 2} r={fontSize / 3} cy={getStringYOffset(stringIdx as StringIdx)}

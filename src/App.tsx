@@ -15,13 +15,14 @@ const GUITAR_TUNING = [
     nameToPitchClass("E5"),
 ]
 
-const FRET_COUNT = 15
+const FRET_COUNT = 12
 
 export function App() {
     const [fretboardState, setFretboardState] = useState<FretboardState>({
         stringsCount: 6,
         fretCount: FRET_COUNT,
         dots: new Map(),
+        stringsHighlights: new Map(),
     })
 
     function onStaffChange(staffState: Map<StaffIdx, StaffLineState>) {
@@ -35,6 +36,7 @@ export function App() {
 
         const newState = new FretboardVisualization(GUITAR_TUNING as FretboardString[], FRET_COUNT)
             .noteDots(highlightedNotes)
+            .stringHighlight(highlightedNotes)
             .toFretboardState()
 
         setFretboardState(newState)

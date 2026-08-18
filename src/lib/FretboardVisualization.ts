@@ -12,6 +12,7 @@ export class FretboardVisualization {
     fretCount: number = 0
 
     private dots: Map<FretboardString, { fret: FretIdx, color: string }[]> = new Map()
+    private stringHighlights: Map<FretboardString, { color: string }> = new Map()
 
     /**
      *
@@ -37,11 +38,22 @@ export class FretboardVisualization {
         return this
     }
 
+    stringHighlight(notes: PitchClass[]) {
+        for (const note of notes) {
+            const stringForNote = this.strings.find(string => (string as number) == (note as number))
+            if (stringForNote) {
+                this.stringHighlights.set(stringForNote, {color: noteToColor(note)})
+            }
+        }
+        return this
+    }
+
     toFretboardState(): FretboardState {
         return {
             stringsCount: this.strings.length,
             fretCount: this.fretCount,
-            dots: this.dotsToFretboardStateDots()
+            dots: this.dotsToFretboardStateDots(),
+            stringsHighlights: this.stringHighlightsToFretboardState()
         }
     }
 
@@ -67,5 +79,13 @@ export class FretboardVisualization {
         }
 
         return dots
+    }
+
+    private stringHighlightsToFretboardState(): FretboardState["stringsHighlights"] {
+        const highlights: FretboardState["stringsHighlights"] = new Map()
+        for (const [string, highlight] of this.stringHighlights.entries()) {
+            highlights.set(this.strings.indexOf(string) as StringIdx, {color: highlight.color})
+        }
+        return highlights;
     }
 }
