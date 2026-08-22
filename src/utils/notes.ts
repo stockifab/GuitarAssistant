@@ -3,6 +3,7 @@ import {invertMap} from "./mapUtils.ts";
 /**
  * Represents a pitch class.
  * C5 is defined with a pitch class of 0, subtract or add 1 for each halftone.
+ * Deeper notes have smaller pitch classes.
  */
 export type PitchClass = number & { readonly __brand: unique symbol }
 /**
@@ -11,6 +12,9 @@ export type PitchClass = number & { readonly __brand: unique symbol }
  */
 export type StaffIdx = number & { readonly __brand: unique symbol }
 
+/**
+ * Maps the index on a staff to its Pitch Class without modifiers
+ */
 const STAFF_IDX_TO_NATURAL_PITCH_CLASS: Map<number, PitchClass> = new Map([
     [0, 0],
     [1, 2],
@@ -20,6 +24,7 @@ const STAFF_IDX_TO_NATURAL_PITCH_CLASS: Map<number, PitchClass> = new Map([
     [5, 9],
     [6, 11],
 ]) as Map<number, PitchClass>
+const NATURAL_PITCH_CLASS_TO_STAFF_IDX = invertMap(STAFF_IDX_TO_NATURAL_PITCH_CLASS)
 const NATURAL_PITCH_CLASSES = [...STAFF_IDX_TO_NATURAL_PITCH_CLASS.values()]
 
 const STAFF_PITCH_CLASS_TO_NAME: Map<PitchClass, string> = new Map([
@@ -56,6 +61,14 @@ function normalizeOctaves<T extends number>(num: T, octaveSize: number): { norma
     return {normalized, octavesShifted};
 }
 
+function removeModifier(pitchClass: PitchClass) {
+    const {normalized, octavesShifted} = normalizeOctaves(pitchClass, 12)
+    if (!NATURAL_PITCH_CLASSES.includes(normalized)) {
+        return removeModifier(pitchClass - 1 as PitchClass)
+    }
+    return normalized + 12 * -octavesShifted as PitchClass
+}
+
 /**
  * Retrieves the base name corresponding to a given pitch class.
  * The base name is the name of the *normalized* note without modifiers (sharp or flat).
@@ -64,8 +77,8 @@ function normalizeOctaves<T extends number>(num: T, octaveSize: number): { norma
  * @return {string} The base name associated with the provided pitch class.
  */
 function getBaseName(pitchClass: PitchClass): string {
-    const {normalized} = normalizeOctaves(pitchClass, 12)
-    return (STAFF_PITCH_CLASS_TO_NAME.get(normalized) ?? STAFF_PITCH_CLASS_TO_NAME.get((normalized - 1) as PitchClass))!
+    const {normalized} = normalizeOctaves(removeModifier(pitchClass), 12)
+    return (STAFF_PITCH_CLASS_TO_NAME.get(normalized))!
 }
 
 /**
@@ -78,6 +91,12 @@ export function staffIdxToPitchClass(staffIdx: StaffIdx): PitchClass {
     let {normalized, octavesShifted} = normalizeOctaves(staffIdx, 7);
 
     return (STAFF_IDX_TO_NATURAL_PITCH_CLASS.get(normalized % 7)! + 12 * -octavesShifted) as PitchClass
+}
+
+export function pitchClassToStaffIdx(pitchClass: PitchClass): StaffIdx {
+    let {normalized, octavesShifted} = normalizeOctaves(removeModifier(pitchClass), 12);
+
+    return (NATURAL_PITCH_CLASS_TO_STAFF_IDX.get(normalized % 12 as PitchClass)! + 7 * -octavesShifted) as StaffIdx
 }
 
 /**

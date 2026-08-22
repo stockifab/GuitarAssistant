@@ -2,22 +2,21 @@ import styles from "./Staff.module.css"
 import {MouseContextProvider} from "../../contexts/MousePositionContext.tsx";
 import {StaffLine, type StaffLineState} from "../StaffLine/StaffLine.tsx";
 import type {StaffIdx} from "../../utils/notes.ts";
-import {useRef} from "react";
 
 
 type StaffProps = {
-    startStaffIdx: StaffIdx;
-    endStaffIdx: StaffIdx;
-    onStaffChange: (states: Map<StaffIdx, StaffLineState>) => void;
+    startStaffIdx: StaffIdx; // index of the bottommost staff line
+    endStaffIdx: StaffIdx; // index of the topmost staff line
     isOutOfBounds: (idx: StaffIdx) => boolean;
+    staffState: Map<StaffIdx, StaffLineState>;
+    setStaffState: (states: Map<StaffIdx, StaffLineState>) => void;
 }
 
-export function Staff({startStaffIdx, endStaffIdx, onStaffChange, isOutOfBounds}: StaffProps) {
-    const staffState = useRef(new Map<StaffIdx, StaffLineState>())
-
+export function Staff({startStaffIdx, endStaffIdx, staffState, setStaffState, isOutOfBounds}: StaffProps) {
     const handleOnChange = (staffIdx: StaffIdx) => function (state: StaffLineState) {
-        staffState.current.set(staffIdx, state)
-        onStaffChange(staffState.current)
+        const newStaffState = new Map(staffState)
+        newStaffState.set(staffIdx, state)
+        setStaffState(newStaffState)
     }
 
     return (
@@ -30,6 +29,7 @@ export function Staff({startStaffIdx, endStaffIdx, onStaffChange, isOutOfBounds}
                                    staffIdx={(endStaffIdx - i) as StaffIdx}
                                    onChange={handleOnChange((endStaffIdx - i) as StaffIdx)}
                                    outOfBounds={isOutOfBounds(endStaffIdx - i as StaffIdx)}
+                                   totalLines={Math.abs(startStaffIdx - endStaffIdx)}
                         />
                     ))}
                 </MouseContextProvider>

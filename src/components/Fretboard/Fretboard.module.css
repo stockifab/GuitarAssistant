@@ -1,9 +1,11 @@
 .fretboardContainer {
     display: flex;
-    border: 1px solid black;
     width: min-content;
+    gap: 20px;
 }
 
-.fretContainer {
-    overflow: visible;
+.fretboardFretContainer {
+    display: flex;
+    border: 1px solid black;
+    width: min-content;
 }

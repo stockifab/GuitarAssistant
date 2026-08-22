@@ -1,0 +1,14 @@
+.fretStringTunerContainer {
+    position: relative;
+    width: 45px;
+}
+
+.fretStringTuner {
+    position: absolute;
+    transform: translateY(-50%);
+}
+
+.fretStringTuner input {
+    box-sizing: border-box;
+    width: 100%;
+}
