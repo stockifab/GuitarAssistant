@@ -3,6 +3,7 @@ import type {FretIdx, StringIdx} from "../../lib/FretboardVisualization.ts";
 import {Fret} from "../Fret/Fret.tsx";
 import {FretStringTuner} from "../FretStringTuner/FretStringTuner.tsx";
 import type {PitchClass} from "../../utils/notes.ts";
+import {ArrowLeft, ArrowRight} from "lucide-react";
 
 export type DotProps = {
     stringIdx: StringIdx;
@@ -20,11 +21,13 @@ type FretboardProps = {
     initialWidth: number;
     height: number;
     fretboardState: FretboardState;
+    setFretCount: (fretCount: number) => void;
     tuning: PitchClass[];
     setTuning: (tuning: PitchClass[]) => void;
 }
 
-export function Fretboard({initialWidth, height, fretboardState, tuning, setTuning}: FretboardProps) {
+export function Fretboard({initialWidth, height, fretboardState, tuning, setTuning, setFretCount}: FretboardProps) {
+
     return <div className={styles.fretboardContainer}>
         <FretStringTuner height={height} state={fretboardState} tuning={tuning} setTuning={setTuning} />
         <div className={styles.fretboardFretContainer}>
@@ -37,6 +40,10 @@ export function Fretboard({initialWidth, height, fretboardState, tuning, setTuni
                     state={fretboardState}
                 />
             )}
+        </div>
+        <div className={styles.addRemoveButtonContainer}>
+            <button aria-label="Add Fret" onClick={() => setFretCount(fretboardState.fretCount + 1)}><ArrowRight/></button>
+            <button aria-label="Add Fret" onClick={() => setFretCount(fretboardState.fretCount - 1)}><ArrowLeft/></button>
         </div>
     </div>
 }

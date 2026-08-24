@@ -4,3 +4,34 @@
     align-items: center;
     height: 100vh;
 }
+
+.staffContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+    gap: 30px;
+}
+
+.clearStaffButton {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #ff3242;
+    border: none;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 1rem;
+    gap: 10px;
+}
+.clearStaffButton :first-child {
+    font-size: 1rem;
+}
+
+.clearStaffButton:hover {
+    background-color: #ff0011;
+}
+
+.clearStaffButton:active {
+    background-color: #cc0000;
+}

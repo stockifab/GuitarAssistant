@@ -1,3 +1,9 @@
 .staffContainer {
-    width: 550px;
+    width: 400px;
+}
+
+@media (min-width: 2000px) {
+    .staffContainer {
+        width: 550px;
+    }
 }

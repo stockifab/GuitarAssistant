@@ -9,3 +9,27 @@
     border: 1px solid black;
     width: min-content;
 }
+
+.addRemoveButtonContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.addRemoveButtonContainer button {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    padding: 0 20px;
+    background-color: white;
+    border: 1px solid black;
+    cursor: pointer;
+}
+
+.addRemoveButtonContainer button:hover {
+    background-color: lightgray;
+}
+
+.addRemoveButtonContainer button:active {
+    background-color: darkgray;
+}

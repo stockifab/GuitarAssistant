@@ -1,40 +1,35 @@
-import {useEffect, useMemo, useRef, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {useMousePosition} from "../../contexts/MousePositionContext.tsx";
 import {clamp} from "../../utils/mathUtils.ts";
 import styles from "./StaffLine.module.css"
 import {clsx} from "clsx";
-import {type PitchClass, pitchClassToName, type StaffIdx, staffIdxToPitchClass} from "../../utils/notes.ts";
+import {type PitchClass, pitchClassToName} from "../../utils/notes.ts";
 import {noteToColor} from "../../utils/visualization.ts";
 
 export type StaffLineState = {
-    showNote: boolean;
-    modifier: -1 | 0 | 1;
-    naturalPitchClass: PitchClass;
+    isActive: boolean; modifier: -1 | 0 | 1; naturalPitchClass: PitchClass;
 }
 
 type StaffLineProps = {
     line: boolean;
-    staffIdx: StaffIdx;
-    onChange: (state: StaffLineState) => void;
     outOfBounds: boolean;
     totalLines: number;
+    state: StaffLineState;
+    setState: (state: StaffLineState) => void;
 }
 
-export function StaffLine({line, staffIdx, onChange, outOfBounds, totalLines}: StaffLineProps) {
-    const [showNote, setShowNote] = useState<boolean>(false)
-    const [modifier, setModifier] = useState<-1 | 0 | 1>(0);
+export function StaffLine({line, state, setState, outOfBounds, totalLines}: StaffLineProps) {
     // offset of the note from the left side of the staff line
     const [noteXOffset, setNoteXOffset] = useState<number | undefined>(undefined);
-
-    const mousePosition = useMousePosition();
+    const [lineHeigh, setLineHeight] = useState(10)
 
     const staffLineRef = useRef<HTMLDivElement | null>(null);
     const noteRef = useRef<SVGEllipseElement | null>(null);
-    const pitchClass = useMemo(() => staffIdxToPitchClass(staffIdx) + modifier as PitchClass, [staffIdx, modifier])
-    const [lineHeigh, setLineHeight] = useState(10)
+
+    const mousePosition = useMousePosition();
 
     useEffect(() => {
-        if (showNote || !staffLineRef.current || !noteRef.current || !mousePosition[0]) {
+        if (state.isActive || !staffLineRef.current || !noteRef.current || !mousePosition[0]) {
             return
         }
 
@@ -45,11 +40,7 @@ export function StaffLine({line, staffIdx, onChange, outOfBounds, totalLines}: S
         const noteWidth = noteBoundingBox?.width ?? 0
 
         setNoteXOffset(clamp(mousePosition[0] - (staffLineBoundingBox.x), noteWidth / 2, staffLineWidth - noteWidth / 2))
-    }, [showNote, mousePosition]);
-
-    useEffect(() => {
-        onChange({showNote, modifier, naturalPitchClass: staffIdxToPitchClass(staffIdx)})
-    }, [showNote, modifier, staffIdx]);
+    }, [state.isActive, mousePosition]);
 
     useEffect(() => {
         const handleResize = () => {
@@ -62,14 +53,14 @@ export function StaffLine({line, staffIdx, onChange, outOfBounds, totalLines}: S
     }, [totalLines])
 
     function toggleNote() {
-        setShowNote(!showNote)
+        setState({...state, isActive: !state.isActive})
     }
 
     function toggleModifier(newModifier: -1 | 0 | 1): void {
-        if (modifier == 0 || modifier != newModifier) {
-            setModifier(newModifier)
+        if (state.modifier == 0 || state.modifier != newModifier) {
+            setState({...state, modifier: newModifier})
         } else {
-            setModifier(0)
+            setState({...state, modifier: 0})
         }
     }
 
@@ -80,9 +71,9 @@ export function StaffLine({line, staffIdx, onChange, outOfBounds, totalLines}: S
         <div className={styles.preNoteSelector} style={{
             fontSize: lineHeigh * 0.8
         }}>
-            <p className={clsx(modifier == -1 && styles.active)} onClick={() => toggleModifier(-1)}>♭</p>
-            <p className={clsx(modifier == 1 && styles.active)} onClick={() => toggleModifier(1)}>#</p>
-            <p className={styles.lineNoteNameText}>{pitchClassToName((staffIdxToPitchClass(staffIdx) + modifier) as PitchClass)}</p>
+            <p className={clsx(state.modifier == -1 && styles.active)} onClick={() => toggleModifier(-1)}>♭</p>
+            <p className={clsx(state.modifier == 1 && styles.active)} onClick={() => toggleModifier(1)}>#</p>
+            <p className={styles.lineNoteNameText}>{pitchClassToName(state.naturalPitchClass + state.modifier as PitchClass)}</p>
         </div>
 
         {/* Note Selector */}
@@ -91,8 +82,8 @@ export function StaffLine({line, staffIdx, onChange, outOfBounds, totalLines}: S
              onClick={toggleNote}>
             <svg className={clsx(styles.noteSVG)}>
                 <ellipse rx={lineHeigh * 1.5} ry={lineHeigh} cx={noteXOffset} cy={lineHeigh / 2}
-                         className={clsx(styles.note, showNote && styles.activeNote)} ref={noteRef}
-                         fill={noteToColor(pitchClass)}/>
+                         className={clsx(styles.note, state.isActive && styles.activeNote)} ref={noteRef}
+                         fill={noteToColor(state.naturalPitchClass + state.modifier as PitchClass)}/>
             </svg>
         </div>
     </div>

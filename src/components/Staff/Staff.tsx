@@ -1,7 +1,7 @@
 import styles from "./Staff.module.css"
 import {MouseContextProvider} from "../../contexts/MousePositionContext.tsx";
 import {StaffLine, type StaffLineState} from "../StaffLine/StaffLine.tsx";
-import type {StaffIdx} from "../../utils/notes.ts";
+import {type StaffIdx, staffIdxToPitchClass} from "../../utils/notes.ts";
 
 
 type StaffProps = {
@@ -13,7 +13,7 @@ type StaffProps = {
 }
 
 export function Staff({startStaffIdx, endStaffIdx, staffState, setStaffState, isOutOfBounds}: StaffProps) {
-    const handleOnChange = (staffIdx: StaffIdx) => function (state: StaffLineState) {
+    const setStaffLineState = (staffIdx: StaffIdx) => (state: StaffLineState) => {
         const newStaffState = new Map(staffState)
         newStaffState.set(staffIdx, state)
         setStaffState(newStaffState)
@@ -25,9 +25,13 @@ export function Staff({startStaffIdx, endStaffIdx, staffState, setStaffState, is
                 <MouseContextProvider>
                     {[...Array(Math.abs(startStaffIdx - endStaffIdx))].map((_, i) => (
                         <StaffLine key={i}
+                                   state={staffState.get(endStaffIdx - i as StaffIdx) ?? {
+                                       isActive: false,
+                                       modifier: 0,
+                                       naturalPitchClass: staffIdxToPitchClass(endStaffIdx - i as StaffIdx)
+                                   }}
+                                   setState={setStaffLineState(endStaffIdx - i as StaffIdx)}
                                    line={(endStaffIdx - i) % 2 != 0}
-                                   staffIdx={(endStaffIdx - i) as StaffIdx}
-                                   onChange={handleOnChange((endStaffIdx - i) as StaffIdx)}
                                    outOfBounds={isOutOfBounds(endStaffIdx - i as StaffIdx)}
                                    totalLines={Math.abs(startStaffIdx - endStaffIdx)}
                         />
