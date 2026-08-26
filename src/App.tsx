@@ -5,16 +5,10 @@ import type {StaffLineState} from "./components/StaffLine/StaffLine.tsx";
 import {useEffect, useMemo, useState} from "react";
 import {type FretboardString, FretboardVisualization} from "./lib/FretboardVisualization.ts";
 import styles from "./App.module.css"
-import {Trash2} from "lucide-react";
+import {Broom} from "lucide-react";
+import {MobileWarning} from "./components/MobileWarning/MobileWarning.tsx";
 
-const GUITAR_TUNING = [
-    nameToPitchClass("E3"),
-    nameToPitchClass("A3"),
-    nameToPitchClass("D4"),
-    nameToPitchClass("G4"),
-    nameToPitchClass("H4"),
-    nameToPitchClass("E5"),
-]
+const GUITAR_TUNING = [nameToPitchClass("E3"), nameToPitchClass("A3"), nameToPitchClass("D4"), nameToPitchClass("G4"), nameToPitchClass("H4"), nameToPitchClass("E5"),]
 
 const FRET_COUNT = 12
 
@@ -34,10 +28,7 @@ export function App() {
     const [staffState, setStaffState] = useState(new Map<StaffIdx, StaffLineState>())
     const [fretCount, setFretCount] = useState(FRET_COUNT)
     const [fretboardState, setFretboardState] = useState<FretboardState>({
-        stringsCount: 6,
-        fretCount: FRET_COUNT,
-        dots: new Map(),
-        stringsHighlights: new Map(),
+        stringsCount: 6, fretCount: FRET_COUNT, dots: new Map(), stringsHighlights: new Map(),
     })
 
     function updateVisualization() {
@@ -62,20 +53,24 @@ export function App() {
         }
     }, [tuning, fretboardState])
 
-    return <div className={styles.main}>
-        <div className={styles.staffContainer}>
-            <Staff startStaffIdx={startStaffIdx}
-                   endStaffIdx={endStaffIdx}
-                   isOutOfBounds={(idx: StaffIdx) => idx > 4 || idx < -6}
-                   staffState={staffState}
-                   setStaffState={setStaffState}/>
-            <button onClick={() => setStaffState(new Map())} className={styles.clearStaffButton}><Trash2 /> Clear Staff</button>
+    return <MobileWarning>
+        <div className={styles.main}>
+            <div className={styles.staffContainer}>
+                <Staff startStaffIdx={startStaffIdx}
+                       endStaffIdx={endStaffIdx}
+                       isOutOfBounds={(idx: StaffIdx) => idx > 4 || idx < -6}
+                       staffState={staffState}
+                       setStaffState={setStaffState}/>
+                <button onClick={() => setStaffState(new Map())} className={styles.clearStaffButton}><Broom/> Clear
+                    Staff
+                </button>
+            </div>
+            <Fretboard initialWidth={120}
+                       height={230}
+                       fretboardState={fretboardState}
+                       setFretCount={setFretCount}
+                       tuning={tuning}
+                       setTuning={setTuning}/>
         </div>
-        <Fretboard initialWidth={120}
-                   height={230}
-                   fretboardState={fretboardState}
-                   setFretCount={setFretCount}
-                   tuning={tuning}
-                   setTuning={setTuning}/>
-    </div>
+    </MobileWarning>
 }

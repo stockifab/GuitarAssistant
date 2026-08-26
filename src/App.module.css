@@ -3,6 +3,7 @@
     justify-content: space-evenly;
     align-items: center;
     height: 100vh;
+    font-family: serif;
 }
 
 .staffContainer {
@@ -16,22 +17,22 @@
     display: flex;
     align-items: center;
     padding: 10px 20px;
-    background-color: #ff3242;
     border: none;
-    color: white;
+    background-color: #ffefef;
     cursor: pointer;
     border-radius: 5px;
     font-size: 1rem;
     gap: 10px;
+    color: #c81e2c;
 }
 .clearStaffButton :first-child {
     font-size: 1rem;
 }
 
 .clearStaffButton:hover {
-    background-color: #ff0011;
+    background-color: #ffbebe;
 }
 
 .clearStaffButton:active {
-    background-color: #cc0000;
+    background-color: #ff8a8a;
 }
